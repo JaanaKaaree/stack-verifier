@@ -13,6 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.stackdigital.mattrverifier",
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs camera access to scan QR codes for credential verification.",
         "NFCReaderUsageDescription": "This app needs NFC access to read NFC tags for location verification.",
@@ -40,11 +41,13 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "CAMERA",
-        "INTERNET",
-        "NFC"
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.NFC",
+        "android.permission.RECORD_AUDIO"
       ],
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "package": "com.anonymous.mattrverifier"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -60,15 +63,14 @@
       [
         "react-native-nfc-manager",
         {
-          "nfcPermission": "This app needs NFC access to read NFC tags for location verification.",
-          "selectIdentifiers": [
-            "A0000002471001"
-          ],
-          "systemCodes": [
-            "8008"
-          ]
+          "nfcPermission": "This app needs NFC access to read NFC tags for location verification."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fc0ee6ed-93ef-45de-901e-a6a36f82ec29"
+      }
+    }
   }
 }
