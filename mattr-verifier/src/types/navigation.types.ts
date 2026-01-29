@@ -12,11 +12,32 @@ export type NFCTagData = {
   row_id: string;
 };
 
+export type CredentialType = 'OrgPartHarvertCredential' | 'DeliveryCredential';
+
+/**
+ * Gets a user-friendly label for a credential type
+ */
+export const getCredentialTypeLabel = (credentialType?: CredentialType): string => {
+  if (!credentialType) return 'Credential';
+  return credentialType === 'DeliveryCredential' ? 'Delivery' : 'Harvest';
+};
+
+/**
+ * Checks if a credential type is a delivery credential
+ */
+export const isDeliveryCredential = (credentialType?: CredentialType): boolean => {
+  return credentialType === 'DeliveryCredential';
+};
+
 export type RootStackParamList = {
   Home: undefined;
-  Scan: undefined;
+  Scan: {
+    credentialType?: CredentialType;
+  };
   Result: {
     verificationResponse: VerificationResponse;
+    credentialType?: CredentialType;
+    payload?: string; // QR code payload for revocation
   };
   NFCReader: undefined;
   NFCResult: {

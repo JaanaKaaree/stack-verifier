@@ -2,17 +2,20 @@
  * Home screen - Landing page with scan button
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation.types';
+import { CredentialType } from '../types/navigation.types';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -24,39 +27,113 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const [showTestMenu, setShowTestMenu] = useState(false);
+  const [titlePressCount, setTitlePressCount] = useState(0);
+
+  const handleTitlePress = () => {
+    const newCount = titlePressCount + 1;
+    setTitlePressCount(newCount);
+    
+    // Show test menu after 5 taps
+    if (newCount >= 5) {
+      setShowTestMenu(true);
+      setTitlePressCount(0);
+    }
+    
+    // Reset count after 2 seconds
+    setTimeout(() => setTitlePressCount(0), 2000);
+  };
+
+  const handleScanHarvest = () => {
+    navigation.navigate('Scan', { credentialType: 'OrgPartHarvertCredential' });
+  };
+
+  const handleScanDelivery = () => {
+    navigation.navigate('Scan', { credentialType: 'DeliveryCredential' });
+  };
+
+  const handleOpenNFC = () => {
+    setShowTestMenu(false);
+    navigation.navigate('NFCReader');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <MaterialIcons name="verified-user" size={80} color="#007AFF" />
-        <Text style={styles.title}>MATTR Credential Verifier</Text>
+        <Pressable onPress={handleTitlePress}>
+          <Text style={styles.title}>MATTR Credential Verifier</Text>
+        </Pressable>
         <Text style={styles.subtitle}>
           Verify Zespri export credentials by scanning QR codes
         </Text>
 
-        <TouchableOpacity
-          style={styles.scanButton}
-          onPress={() => navigation.navigate('Scan')}
-        >
-          <MaterialIcons name="qr-code-scanner" size={24} color="#FFFFFF" />
-          <Text style={styles.scanButtonText}>Scan QR Code</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.credentialButton, styles.harvestButton]}
+            onPress={handleScanHarvest}
+          >
+            <MaterialIcons name="agriculture" size={28} color="#FFFFFF" />
+            <Text style={styles.credentialButtonText}>Scan Harvest Credential</Text>
+            <Text style={styles.credentialButtonSubtext}>
+              Verify harvest credentials
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.nfcButton}
-          onPress={() => navigation.navigate('NFCReader')}
-        >
-          <MaterialIcons name="nfc" size={24} color="#FFFFFF" />
-          <Text style={styles.nfcButtonText}>Read NFC Tag</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.credentialButton, styles.deliveryButton]}
+            onPress={handleScanDelivery}
+          >
+            <MaterialIcons name="local-shipping" size={28} color="#FFFFFF" />
+            <Text style={styles.credentialButtonText}>Scan Delivery Credential</Text>
+            <Text style={styles.credentialButtonSubtext}>
+              Verify delivery credentials
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.infoBox}>
           <MaterialIcons name="info" size={20} color="#666" />
           <Text style={styles.infoText}>
-            Point your camera at a credential QR code to verify its authenticity
-            and view package details.
+            Select the type of credential you want to verify, then scan the QR code.
           </Text>
         </View>
       </View>
+
+      {/* Hidden Test Menu Modal */}
+      <Modal
+        visible={showTestMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowTestMenu(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowTestMenu(false)}
+        >
+          <View style={styles.testMenu}>
+            <Text style={styles.testMenuTitle}>Test Menu</Text>
+            <Text style={styles.testMenuSubtitle}>
+              Hidden developer options
+            </Text>
+            
+            <TouchableOpacity
+              style={styles.testMenuButton}
+              onPress={handleOpenNFC}
+            >
+              <MaterialIcons name="nfc" size={24} color="#007AFF" />
+              <Text style={styles.testMenuButtonText}>Read RFID/NFC Tag</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.testMenuButton, styles.testMenuButtonClose]}
+              onPress={() => setShowTestMenu(false)}
+            >
+              <Text style={styles.testMenuButtonCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -84,18 +161,22 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginTop: 12,
     textAlign: 'center',
-    marginBottom: 48,
+    marginBottom: 32,
   },
-  scanButton: {
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 400,
+    gap: 16,
+    marginBottom: 32,
+  },
+  credentialButton: {
     backgroundColor: '#007AFF',
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
     borderRadius: 12,
-    minWidth: 200,
-    shadowColor: '#007AFF',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -103,42 +184,29 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
-    marginBottom: 16,
   },
-  scanButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  nfcButton: {
+  harvestButton: {
     backgroundColor: '#34C759',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    minWidth: 200,
-    shadowColor: '#34C759',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
   },
-  nfcButtonText: {
+  deliveryButton: {
+    backgroundColor: '#007AFF',
+  },
+  credentialButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 8,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  credentialButtonSubtext: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    opacity: 0.9,
+    marginTop: 4,
   },
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 48,
+    marginTop: 24,
     padding: 16,
     backgroundColor: '#F2F2F7',
     borderRadius: 8,
@@ -150,5 +218,63 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     flex: 1,
     lineHeight: 20,
+  },
+  // Test Menu Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  testMenu: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    maxWidth: 320,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  testMenuTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 4,
+  },
+  testMenuSubtitle: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 20,
+  },
+  testMenuButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#F2F2F7',
+    marginBottom: 12,
+  },
+  testMenuButtonText: {
+    fontSize: 16,
+    color: '#007AFF',
+    marginLeft: 12,
+    fontWeight: '600',
+  },
+  testMenuButtonClose: {
+    backgroundColor: 'transparent',
+    marginTop: 8,
+    marginBottom: 0,
+  },
+  testMenuButtonCloseText: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
   },
 });

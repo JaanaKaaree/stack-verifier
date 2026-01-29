@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
 import { QRScanner } from '../components/QRScanner';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { verifyCredential } from '../services/verificationService';
@@ -23,14 +24,22 @@ type ScanScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Scan'
 >;
+type ScanScreenRouteProp = RouteProp<RootStackParamList, 'Scan'>;
 
 interface ScanScreenProps {
   navigation: ScanScreenNavigationProp;
+  route: ScanScreenRouteProp;
 }
 
-export const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
+export const ScanScreen: React.FC<ScanScreenProps> = ({ navigation, route }) => {
+  const credentialType = route.params?.credentialType || 'OrgPartHarvertCredential';
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Log credential type for debugging
+  React.useEffect(() => {
+    console.log(`[ScanScreen] Scanning ${credentialType} credential`);
+  }, [credentialType]);
 
   const handleScan = async (qrData: string) => {
     if (isVerifying) {
@@ -42,15 +51,29 @@ export const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
     setError(null);
 
     try {
-      const response: VerificationResponse = await verifyCredential(qrData);
+      const response: VerificationResponse = await verifyCredential(qrData, credentialType);
       console.log('[ScanScreen] Verification response:', response);
 
       setIsVerifying(false);
 
       // Navigate to result screen if we have data (verified or unverified)
       if (response.data) {
-        navigation.replace('Result', {
-          verificationResponse: response,
+        console.log('[ScanScreen] Navigating to Result with payload:', qrData.substring(0, 50) + '...');
+        console.log('[ScanScreen] Payload length:', qrData.length);
+        // Use reset to ensure fresh navigation state and updated params
+        navigation.reset({
+          index: 1,
+          routes: [
+            { name: 'Home' },
+            {
+              name: 'Result',
+              params: {
+                verificationResponse: response,
+                credentialType: credentialType,
+                payload: qrData, // Pass the QR payload for revocation
+              },
+            },
+          ],
         });
       } else {
         // Only show error if there's no data to display

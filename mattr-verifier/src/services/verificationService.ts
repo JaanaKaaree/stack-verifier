@@ -4,22 +4,31 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { API_BASE_URL, VERIFICATION_ENDPOINT, API_TIMEOUT, ERROR_MESSAGES } from '../constants/config';
+import { API_BASE_URL, VERIFICATION_ENDPOINT, REVOKE_ENDPOINT, API_TIMEOUT, ERROR_MESSAGES, USER_ID, MOBILE_APPLICATION_ID } from '../constants/config';
 import { VerificationResponse } from '../types/credential.types';
+import { CredentialType } from '../types/navigation.types';
 
 /**
  * Verifies a credential by calling the backend API
  * @param qrData - The QR code data scanned from the credential
+ * @param credentialType - The type of credential being verified ('OrgPartHarvertCredential' or 'DeliveryCredential')
  * @returns Promise resolving to VerificationResponse
  */
-export const verifyCredential = async (qrData: string): Promise<VerificationResponse> => {
+export const verifyCredential = async (qrData: string, credentialType?: CredentialType): Promise<VerificationResponse> => {
   const apiUrl = `${API_BASE_URL}${VERIFICATION_ENDPOINT}`;
+  
   const requestBody = {
     payload: qrData,
+    user_id: USER_ID,
+    mobile_application_id: MOBILE_APPLICATION_ID,
+    credential_type: credentialType, // Backend expects: 'OrgPartHarvertCredential' or 'DeliveryCredential'
   };
 
   console.log('[VerificationService] Starting verification...');
   console.log('[VerificationService] API URL:', apiUrl);
+  console.log('[VerificationService] Credential Type:', credentialType || 'not specified');
+  console.log('[VerificationService] User ID:', USER_ID);
+  console.log('[VerificationService] Mobile Application ID:', MOBILE_APPLICATION_ID);
   console.log('[VerificationService] QR Data (payload):', qrData.substring(0, 50) + '...');
 
   try {
@@ -133,6 +142,106 @@ export const verifyCredential = async (qrData: string): Promise<VerificationResp
     return {
       success: false,
       data: null,
+      error: ERROR_MESSAGES.UNKNOWN_ERROR,
+    };
+  }
+};
+
+/**
+ * Revokes a credential by calling the backend API
+ * @param payload - The QR code payload to revoke
+ * @param credentialType - The type of credential being revoked ('OrgPartHarvertCredential' or 'DeliveryCredential')
+ * @returns Promise resolving to success status
+ */
+export const revokeCredential = async (payload: string, credentialType?: CredentialType): Promise<{ success: boolean; error?: string }> => {
+  const apiUrl = `${API_BASE_URL}${REVOKE_ENDPOINT}`;
+  
+  const requestBody = {
+    payload: payload,
+    user_id: USER_ID,
+    mobile_application_id: MOBILE_APPLICATION_ID,
+    credential_type: credentialType,
+  };
+
+  console.log('[VerificationService] Starting revocation...');
+  console.log('[VerificationService] API URL:', apiUrl);
+  console.log('[VerificationService] Credential Type:', credentialType || 'not specified');
+  console.log('[VerificationService] Payload length:', payload.length);
+
+  try {
+    const response = await axios.post(
+      apiUrl,
+      requestBody,
+      {
+        timeout: API_TIMEOUT,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('[VerificationService] Revocation response status:', response.status);
+    console.log('[VerificationService] Revocation response data:', JSON.stringify(response.data, null, 2));
+
+    // Handle successful response (201 Created or 200 OK)
+    if (response.status === 201 || response.status === 200) {
+      return {
+        success: true,
+      };
+    }
+
+    // Unexpected status code
+    return {
+      success: false,
+      error: ERROR_MESSAGES.API_ERROR,
+    };
+  } catch (error) {
+    console.error('[VerificationService] Revocation error occurred:', error);
+    
+    // Handle axios errors
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+
+      console.error('[VerificationService] Axios error details:');
+      console.error('  - Code:', axiosError.code);
+      console.error('  - Message:', axiosError.message);
+      console.error('  - Response:', axiosError.response?.status, axiosError.response?.statusText);
+      console.error('  - Response data:', axiosError.response?.data);
+
+      // Network error
+      if (!axiosError.response) {
+        return {
+          success: false,
+          error: ERROR_MESSAGES.NETWORK_ERROR,
+        };
+      }
+
+      // Timeout error
+      if (axiosError.code === 'ECONNABORTED') {
+        return {
+          success: false,
+          error: ERROR_MESSAGES.TIMEOUT_ERROR,
+        };
+      }
+
+      // HTTP error response
+      if (axiosError.response.status >= 400) {
+        const responseData = axiosError.response.data as { error?: string; message?: string } | undefined;
+        const errorMessage =
+          responseData?.error ||
+          responseData?.message ||
+          ERROR_MESSAGES.API_ERROR;
+
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      }
+    }
+
+    // Unknown error
+    return {
+      success: false,
       error: ERROR_MESSAGES.UNKNOWN_ERROR,
     };
   }

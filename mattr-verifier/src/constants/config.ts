@@ -8,11 +8,23 @@
 // IMPORTANT NOTES:
 // - CORS is NOT needed for React Native (unlike web browsers)
 // - For emulator/simulator: use 'http://localhost:3001' or 'http://10.0.2.2:3001' (Android emulator)
-// - For physical device: use 'http://YOUR_COMPUTER_IP:3001' (find IP with ipconfig/ifconfig)
+// - For physical device on same network: use 'http://YOUR_COMPUTER_IP:3001' (find IP with ipconfig/ifconfig)
+// - For tunnel (different networks): use your tunnel URL (e.g., 'https://xxxx-xxxx-xxxx.ngrok.io' or 'https://xxxx.loca.lt')
+//   NOTE: If you're using Expo tunnel (--tunnel flag), you ALSO need a tunnel for your backend API!
+//   Set up a separate tunnel for your backend (ngrok, localtunnel, etc.) and use that URL here.
 // - For production: use HTTPS (required): 'https://your-api-domain.com'
 // - HTTP is allowed in development (configured in app.json)
-export const API_BASE_URL = 'http://192.168.1.59:3001';
+//
+// EXAMPLES:
+// - Same network: 'http://192.168.1.59:3001'
+// - Ngrok tunnel: 'https://abc123def456.ngrok.io' (or 'https://abc123def456.ngrok-free.app')
+// - Localtunnel: 'https://xxxx.loca.lt'
+// - Cloudflare tunnel: 'https://xxxx.trycloudflare.com'
+// export const API_BASE_URL = 'http://192.168.1.59:3001';
+// export const API_BASE_URL = 'http://10.10.10.211:3001';
+export const API_BASE_URL = 'https://settled-ample-hippo.ngrok-free.app'; // Uncomment and replace with your tunnel URL
 export const VERIFICATION_ENDPOINT = '/api/v1/verify';
+export const REVOKE_ENDPOINT = '/api/v1/revoke';
 export const API_TIMEOUT = 10000; // 10 seconds
 
 // Camera Permissions
@@ -47,3 +59,10 @@ export const APP_CONFIG = {
   name: 'MATTR Verifier',
   version: '1.0.0',
 };
+
+// User and Application Identification
+// TODO: These will eventually come from user profile/onboarding
+// For now, these are hardcoded unique IDs for this app instance
+// Format: UUID v4 (e.g., '550e8400-e29b-41d4-a716-446655440000')
+export const USER_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde'; // Unique user ID
+export const MOBILE_APPLICATION_ID = 'f9e8d7c6-b5a4-3210-9876-543210fedcba'; // Unique mobile app instance ID

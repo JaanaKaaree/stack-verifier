@@ -11,7 +11,7 @@ import { ScanScreen } from './src/screens/ScanScreen';
 import { ResultScreen } from './src/screens/ResultScreen';
 import { NFCReaderScreen } from './src/screens/NFCReaderScreen';
 import { NFCResultScreen } from './src/screens/NFCResultScreen';
-import { RootStackParamList } from './src/types/navigation.types';
+import { RootStackParamList, CredentialType, getCredentialTypeLabel } from './src/types/navigation.types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -42,9 +42,14 @@ export default function App() {
         <Stack.Screen
           name="Scan"
           component={ScanScreen}
-          options={{
-            title: 'Scan QR Code',
-            headerShown: true,
+          options={({ route }) => {
+            const credentialType = (route.params as { credentialType?: CredentialType })?.credentialType;
+            const label = getCredentialTypeLabel(credentialType);
+            const title = `Scan ${label} Credential`;
+            return {
+              title,
+              headerShown: true,
+            };
           }}
         />
         <Stack.Screen
