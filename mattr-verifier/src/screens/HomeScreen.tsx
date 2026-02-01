@@ -90,12 +90,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               Verify delivery credentials
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.credentialButton, styles.nfcButton]}
+            onPress={() => navigation.navigate('NFCReader')}
+          >
+            <MaterialIcons name="nfc" size={28} color="#FFFFFF" />
+            <Text style={styles.credentialButtonText}>Read NFC Tag</Text>
+            <Text style={styles.credentialButtonSubtext}>
+              Scan NFC tags for location verification
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.infoBox}>
           <MaterialIcons name="info" size={20} color="#666" />
           <Text style={styles.infoText}>
-            Select the type of credential you want to verify, then scan the QR code.
+            Select the type of credential you want to verify, scan the QR code, or read an NFC tag.
           </Text>
         </View>
       </View>
@@ -190,6 +201,9 @@ const styles = StyleSheet.create({
   },
   deliveryButton: {
     backgroundColor: '#007AFF',
+  },
+  nfcButton: {
+    backgroundColor: '#5856D6',
   },
   credentialButtonText: {
     color: '#FFFFFF',
