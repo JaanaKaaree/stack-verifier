@@ -1,8 +1,8 @@
-# MATTR Verifier React Native App - Cursor Implementation Guide
+# STACK Verifier React Native App - Cursor Implementation Guide
 
 **Author:** Neil Mendes  
 **Company:** Esra Innovate  
-**Purpose:** Starter instructions for building a MATTR credential verifier app using Cursor AI coding tool
+**Purpose:** Starter instructions for building a STACK credential verifier app using Cursor AI coding tool
 
 ---
 
@@ -407,7 +407,7 @@ Update app.json (or app.config.js) with:
    - android.permissions: CAMERA
 
 2. App metadata:
-   - name: "MATTR Verifier"
+   - name: "STACK Verifier"
    - slug: "mattr-verifier"
    - version: "1.0.0"
    - orientation: "portrait"
@@ -683,7 +683,7 @@ Your app is ready when:
 **Document Version:** 1.0  
 **Last Updated:** January 2025  
 **Author:** Neil Mendes, Esra Innovate  
-**Purpose:** Cursor AI implementation guide for MATTR verifier app
+**Purpose:** Cursor AI implementation guide for STACK verifier app
 
 ---
 

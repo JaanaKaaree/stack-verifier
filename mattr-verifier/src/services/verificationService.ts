@@ -1,5 +1,5 @@
 /**
- * Verification service for MATTR credentials
+ * Verification service for STACK credentials
  * Handles API calls to the verification backend
  */
 

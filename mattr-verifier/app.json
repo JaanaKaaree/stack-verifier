@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mattr-verifier",
-    "slug": "mattr-verifier",
+    "name": "STACK Verifier",
+    "slug": "stack-verifier",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

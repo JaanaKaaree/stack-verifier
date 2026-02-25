@@ -1,6 +1,6 @@
-# How to Use MATTR Verifier App
+# How to Use STACK Verifier App
 
-This guide explains how to run and connect to the MATTR Verifier app in different network scenarios.
+This guide explains how to run and connect to the STACK Verifier app in different network scenarios.
 
 ## Prerequisites
 
@@ -71,13 +71,13 @@ Sometimes Expo shows:
 ### Step 3: Connect Your Phone
 
 **Option A: Scan QR Code**
-1. Open the MATTR Verifier app on your phone
+1. Open the STACK Verifier app on your phone
 2. Tap "Scan QR code" when prompted
 3. Point your camera at the QR code in the terminal
 4. Wait for the app to load
 
 **Option B: Enter URL Manually**
-1. Open the MATTR Verifier app on your phone
+1. Open the STACK Verifier app on your phone
 2. Tap "Enter URL manually"
 3. Type: `exp://YOUR_IP_ADDRESS:8081` (replace with your actual IP)
    - Example: `exp://192.168.1.59:8081`
@@ -118,13 +118,13 @@ The URL will have a `.exp.direct` domain instead of an IP address.
 ### Step 2: Connect Your Phone
 
 **Option A: Scan QR Code**
-1. Open the MATTR Verifier app on your phone
+1. Open the STACK Verifier app on your phone
 2. Tap "Scan QR code"
 3. Point your camera at the QR code in the terminal
 4. Wait for the app to load (first time may take a minute)
 
 **Option B: Enter URL Manually**
-1. Open the MATTR Verifier app on your phone
+1. Open the STACK Verifier app on your phone
 2. Tap "Enter URL manually"
 3. Copy the full URL from terminal (starts with `exp://` and ends with `.exp.direct`)
    - Example: `exp://abc123def456.tunnelname.exp.direct:80`

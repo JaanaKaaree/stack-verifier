@@ -1,4 +1,4 @@
-# MATTR Verifier React Native App
+# STACK Verifier React Native App
 
 A React Native mobile app built with Expo that scans QR codes from MATTR credentials and displays verified credential information.
 

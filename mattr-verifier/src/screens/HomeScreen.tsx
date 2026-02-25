@@ -1,5 +1,5 @@
 /**
- * Home screen - Landing page with scan button
+ * Home screen - Landing page with scan options and bottom action bar
  */
 
 import React, { useState } from 'react';
@@ -11,11 +11,11 @@ import {
   SafeAreaView,
   Modal,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation.types';
-import { CredentialType } from '../types/navigation.types';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -33,14 +33,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const handleTitlePress = () => {
     const newCount = titlePressCount + 1;
     setTitlePressCount(newCount);
-    
-    // Show test menu after 5 taps
+
     if (newCount >= 5) {
       setShowTestMenu(true);
       setTitlePressCount(0);
     }
-    
-    // Reset count after 2 seconds
     setTimeout(() => setTitlePressCount(0), 2000);
   };
 
@@ -59,56 +56,82 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <MaterialIcons name="verified-user" size={80} color="#007AFF" />
-        <Pressable onPress={handleTitlePress}>
-          <Text style={styles.title}>MATTR Credential Verifier</Text>
-        </Pressable>
-        <Text style={styles.subtitle}>
-          Verify Zespri export credentials by scanning QR codes
-        </Text>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.hero}>
+          <MaterialIcons name="verified-user" size={72} color="#007AFF" />
+          <Pressable onPress={handleTitlePress}>
+            <Text style={styles.title}>STACK Credential Verifier</Text>
+          </Pressable>
+          <Text style={styles.subtitle}>
+            Verify Zespri export credentials by scanning QR codes or NFC tags
+          </Text>
+        </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.credentialButton, styles.harvestButton]}
-            onPress={handleScanHarvest}
-          >
-            <MaterialIcons name="agriculture" size={28} color="#FFFFFF" />
-            <Text style={styles.credentialButtonText}>Scan Harvest Credential</Text>
-            <Text style={styles.credentialButtonSubtext}>
-              Verify harvest credentials
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.credentialButton, styles.deliveryButton]}
-            onPress={handleScanDelivery}
-          >
-            <MaterialIcons name="local-shipping" size={28} color="#FFFFFF" />
-            <Text style={styles.credentialButtonText}>Scan Delivery Credential</Text>
-            <Text style={styles.credentialButtonSubtext}>
-              Verify delivery credentials
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.credentialButton, styles.nfcButton]}
-            onPress={() => navigation.navigate('NFCReader')}
-          >
-            <MaterialIcons name="nfc" size={28} color="#FFFFFF" />
-            <Text style={styles.credentialButtonText}>Read NFC Tag</Text>
-            <Text style={styles.credentialButtonSubtext}>
-              Scan NFC tags for location verification
-            </Text>
-          </TouchableOpacity>
+        {/* Default content: Scan harvest & delivery */}
+        <View style={styles.defaultCard}>
+          <View style={styles.defaultCardHeader}>
+            <MaterialIcons name="qr-code-scanner" size={32} color="#007AFF" />
+            <Text style={styles.defaultCardTitle}>Scan harvest & delivery</Text>
+          </View>
+          <Text style={styles.defaultCardDescription}>
+            Choose an option below to scan a harvest credential, delivery credential, or read an NFC tag for location verification.
+          </Text>
+          <View style={styles.quickActions}>
+            <View style={styles.quickActionItem}>
+              <MaterialIcons name="agriculture" size={20} color="#34C759" />
+              <Text style={styles.quickActionText}>Harvest</Text>
+            </View>
+            <View style={styles.quickActionItem}>
+              <MaterialIcons name="local-shipping" size={20} color="#007AFF" />
+              <Text style={styles.quickActionText}>Delivery</Text>
+            </View>
+            <View style={styles.quickActionItem}>
+              <MaterialIcons name="nfc" size={20} color="#5856D6" />
+              <Text style={styles.quickActionText}>Tag</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.infoBox}>
-          <MaterialIcons name="info" size={20} color="#666" />
+          <MaterialIcons name="info-outline" size={20} color="#666" />
           <Text style={styles.infoText}>
-            Select the type of credential you want to verify, scan the QR code, or read an NFC tag.
+            Select Harvest, Delivery, or Tag below to start verifying.
           </Text>
         </View>
+      </ScrollView>
+
+      {/* Bottom bar: 3 smaller buttons */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={[styles.bottomButton, styles.bottomButtonHarvest]}
+          onPress={handleScanHarvest}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="agriculture" size={24} color="#FFFFFF" />
+          <Text style={styles.bottomButtonText}>Harvest</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bottomButton, styles.bottomButtonDelivery]}
+          onPress={handleScanDelivery}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="local-shipping" size={24} color="#FFFFFF" />
+          <Text style={styles.bottomButtonText}>Delivery</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bottomButton, styles.bottomButtonTag]}
+          onPress={() => navigation.navigate('NFCReader')}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="nfc" size={24} color="#FFFFFF" />
+          <Text style={styles.bottomButtonText}>Tag</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Hidden Test Menu Modal */}
@@ -152,86 +175,128 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F9FA',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 24,
+  },
+  hero: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
+    marginBottom: 28,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333333',
-    marginTop: 24,
+    color: '#1A1A1A',
+    marginTop: 20,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginTop: 12,
+    fontSize: 15,
+    color: '#6B7280',
+    marginTop: 10,
     textAlign: 'center',
-    marginBottom: 32,
+    paddingHorizontal: 8,
   },
-  buttonContainer: {
-    width: '100%',
-    maxWidth: 400,
-    gap: 16,
-    marginBottom: 32,
-  },
-  credentialButton: {
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+  defaultCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
     shadowRadius: 8,
-    elevation: 5,
+    elevation: 3,
   },
-  harvestButton: {
-    backgroundColor: '#34C759',
+  defaultCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  deliveryButton: {
-    backgroundColor: '#007AFF',
-  },
-  nfcButton: {
-    backgroundColor: '#5856D6',
-  },
-  credentialButtonText: {
-    color: '#FFFFFF',
+  defaultCardTitle: {
     fontSize: 18,
     fontWeight: '700',
-    marginTop: 8,
+    color: '#1A1A1A',
+    marginLeft: 12,
   },
-  credentialButtonSubtext: {
-    color: '#FFFFFF',
+  defaultCardDescription: {
     fontSize: 14,
-    opacity: 0.9,
-    marginTop: 4,
+    color: '#6B7280',
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  quickActionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  quickActionText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
   },
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 24,
-    padding: 16,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 8,
-    maxWidth: 320,
+    padding: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   infoText: {
-    fontSize: 14,
-    color: '#666666',
-    marginLeft: 12,
+    fontSize: 13,
+    color: '#6B7280',
+    marginLeft: 10,
     flex: 1,
     lineHeight: 20,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    gap: 10,
+  },
+  bottomButton: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    gap: 4,
+  },
+  bottomButtonHarvest: {
+    backgroundColor: '#34C759',
+  },
+  bottomButtonDelivery: {
+    backgroundColor: '#007AFF',
+  },
+  bottomButtonTag: {
+    backgroundColor: '#5856D6',
+  },
+  bottomButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   // Test Menu Styles
   modalOverlay: {

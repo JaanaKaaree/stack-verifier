@@ -35,7 +35,7 @@ export default function App() {
           name="Home"
           component={HomeScreen}
           options={{
-            title: 'MATTR Verifier',
+            title: 'STACK Verifier',
             headerShown: true,
           }}
         />

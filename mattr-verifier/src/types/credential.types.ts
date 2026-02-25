@@ -1,5 +1,5 @@
 /**
- * TypeScript interfaces for MATTR credential verification
+ * TypeScript interfaces for STACK credential verification
  */
 
 export interface DecodedCredential {
